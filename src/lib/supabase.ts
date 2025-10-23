@@ -1,32 +1,54 @@
-import { createClient } from '@supabase/supabase-js'
+import { supabaseClientManager } from './supabase-manager';
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL')
-}
-if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY')
-}
+// Get the Procurement and inventory client with proper isolation
+export const supabase = supabaseClientManager.getClient({
+  serviceName: 'ff-purc-6870',
+  storageKey: 'supabase.auth.procurement',
+  options: {
+  },
+});
 
-// Client for browser usage (uses anon key)
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-    },
+// Helper functions for ff-purc-6870
+export async function getUserHospitalId(userId: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('entity_platform_id')
+    .eq('id', userId)
+    .single();
+    
+  if (error) {
+    console.error('[ff-purc-6870] Error fetching user hospital ID:', error);
+    return null;
   }
-)
+  
+  return data?.entity_platform_id || null;
+}
 
-// Admin client for server-side usage (uses service role key)
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_SUPABASE_SECRET_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
+
+
+
+
+
+// Inventory-specific helpers
+export async function getInventoryByLocation(locationId: string) {
+  const { data, error } = await supabase
+    .from('inventory')
+    .select('*')
+    .eq('location_id', locationId)
+    .order('item_name');
+    
+  if (error) {
+    console.error('[ff-purc-6870] Error fetching inventory:', error);
+    return null;
   }
-)
+  
+  return data;
+}
+
+// Export manager for cross-service coordination
+export { supabaseClientManager };
+
+// Performance monitoring in development
+if (process.env.NODE_ENV === 'development') {
+  console.log(`[ff-purc-6870] Client manager active with ${supabaseClientManager.getClientCount()} total clients`);
+}

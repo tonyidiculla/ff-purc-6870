@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { purchasingNavigation } from '@/config/purchasing-navigation';
 
 // Type definitions
 interface NavigationChild {
@@ -144,7 +145,11 @@ const defaultNavigation: NavigationItem[] = [
   },
 ];
 
-export const Sidebar: React.FC<FurfieldSidebarProps> = ({ navigation }) => {
+export default function FurfieldSidebar({
+  currentModule = 'Purchasing',
+  appName = 'PURC',
+  navigation = purchasingNavigation,
+}: FurfieldSidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = React.useState<string[]>(['Outpatient']);
 
