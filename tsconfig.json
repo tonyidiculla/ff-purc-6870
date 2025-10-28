@@ -23,6 +23,7 @@
       }
     ],
     "paths": {
+      "@ff-shared/*": ["../ff-auth-6800/*"],
       "@/*": [
         "./src/*"
       ]
@@ -36,6 +37,7 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "backup-*"
   ]
 }

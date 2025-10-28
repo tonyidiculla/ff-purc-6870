@@ -88,8 +88,6 @@ export const purchasingNavigation: NavigationItem[] = [
       { name: 'Inventory Reports', href: '/reports/inventory' },
     ],
   },
-    ],
-  },
   {
     name: 'Operation Theater',
     href: 'http://localhost:6830/operation-theater/schedule',
